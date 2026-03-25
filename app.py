@@ -7,10 +7,25 @@ name = st.text_input("Patient Name")
 age = st.number_input("Age", 1, 120, 25)
 gender = st.selectbox("Gender", ["Male", "Female"])
 
-# Medical History
-smoking = st.selectbox("Smoking", ["No", "Yes"])
-diabetes = st.selectbox("Diabetes", ["No", "Controlled", "Uncontrolled"])
-systemic = st.selectbox("Other Systemic Diseases", ["No", "Yes"])
+# 🟢 Life Style
+lifestyle = st.multiselect(
+    "Life Style",
+    ["Smoking", "Alcohol", "Drugs"]
+)
+
+# 🟢 Medical Conditions
+diseases = st.multiselect(
+    "Medical Conditions",
+    [
+        "Diabetes",
+        "Cardiovascular Disease",
+        "Hypertension",
+        "Osteoporosis",
+        "Immunocompromised",
+        "Pregnancy",
+        "None"
+    ]
+)
 
 # Clinical Data
 pocket = st.number_input("Pocket Depth (mm)", 1, 15, 3)
@@ -49,11 +64,15 @@ if st.button("Diagnose"):
         else:
             grade = "Grade C"
 
-        # 🔥 تعديل Grade حسب الحالة
-        if smoking == "Yes" or diabetes == "Uncontrolled":
+        # 🔥 تعديل حسب lifestyle
+        if "Smoking" in lifestyle or "Drugs" in lifestyle:
             grade = "Grade C (High Risk)"
-        elif diabetes == "Controlled":
-            grade = "Grade B (Moderate Risk)"
+
+        # 🔥 تعديل حسب الأمراض
+        if "Diabetes" in diseases or "Immunocompromised" in diseases:
+            grade = "Grade C (Systemic Risk)"
+        elif "Cardiovascular Disease" in diseases:
+            grade = "Grade B (Medical Risk)"
 
         # Treatment
         treatment = "Scaling + Root Planing"
@@ -61,10 +80,10 @@ if st.button("Diagnose"):
         if stage in ["Stage III", "Stage IV"]:
             treatment += " + Surgical Therapy"
 
-        if smoking == "Yes":
-            treatment += " + Smoking cessation advice"
+        if "Smoking" in lifestyle:
+            treatment += " + Smoking cessation"
 
-        if diabetes != "No":
+        if diseases and "None" not in diseases:
             treatment += " + Medical consultation"
 
     else:
