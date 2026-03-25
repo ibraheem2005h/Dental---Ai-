@@ -7,13 +7,13 @@ name = st.text_input("Patient Name")
 age = st.number_input("Age", 1, 120, 25)
 gender = st.selectbox("Gender", ["Male", "Female"])
 
-# 🟢 Life Style
+# Life Style
 lifestyle = st.multiselect(
     "Life Style",
     ["Smoking", "Alcohol", "Drugs"]
 )
 
-# 🟢 Medical Conditions
+# Medical Conditions
 diseases = st.multiselect(
     "Medical Conditions",
     [
@@ -54,7 +54,7 @@ if st.button("Diagnose"):
         else:
             stage = "Stage IV"
 
-        # Grade (CAL/Age)
+        # Grade
         ratio = cal / age
 
         if ratio < 0.25:
@@ -64,11 +64,11 @@ if st.button("Diagnose"):
         else:
             grade = "Grade C"
 
-        # 🔥 تعديل حسب lifestyle
+        # تعديل حسب lifestyle
         if "Smoking" in lifestyle or "Drugs" in lifestyle:
             grade = "Grade C (High Risk)"
 
-        # 🔥 تعديل حسب الأمراض
+        # تعديل حسب الأمراض
         if "Diabetes" in diseases or "Immunocompromised" in diseases:
             grade = "Grade C (Systemic Risk)"
         elif "Cardiovascular Disease" in diseases:
@@ -94,8 +94,21 @@ if st.button("Diagnose"):
 
     # Output
     st.subheader("Result")
+
+    # High Risk Alert
+    if ("Smoking" in lifestyle or "Drugs" in lifestyle or
+        "Diabetes" in diseases or stage in ["Stage III", "Stage IV"]):
+        st.error("⚠️ High Risk Patient")
+
+    # Colored Diagnosis
+    if diagnosis == "Healthy":
+        st.success(f"Diagnosis: {diagnosis}")
+    elif diagnosis == "Gingivitis":
+        st.warning(f"Diagnosis: {diagnosis}")
+    else:
+        st.error(f"Diagnosis: {diagnosis}")
+
     st.write("Name:", name)
-    st.write("Diagnosis:", diagnosis)
     st.write("Stage:", stage)
     st.write("Grade:", grade)
     st.write("Treatment:", treatment)
