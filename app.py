@@ -7,6 +7,11 @@ name = st.text_input("Patient Name")
 age = st.number_input("Age", 1, 120, 25)
 gender = st.selectbox("Gender", ["Male", "Female"])
 
+# Medical History
+smoking = st.selectbox("Smoking", ["No", "Yes"])
+diabetes = st.selectbox("Diabetes", ["No", "Controlled", "Uncontrolled"])
+systemic = st.selectbox("Other Systemic Diseases", ["No", "Yes"])
+
 # Clinical Data
 pocket = st.number_input("Pocket Depth (mm)", 1, 15, 3)
 bleeding = st.selectbox("Bleeding on Probing", ["No", "Yes"])
@@ -34,15 +39,33 @@ if st.button("Diagnose"):
         else:
             stage = "Stage IV"
 
-        # Grade (based on age roughly)
-        if age < 30:
-            grade = "Grade C (Rapid progression)"
-        elif age < 50:
-            grade = "Grade B (Moderate)"
-        else:
-            grade = "Grade A (Slow)"
+        # Grade (CAL/Age)
+        ratio = cal / age
 
-        treatment = "Scaling + Root Planing or Surgery"
+        if ratio < 0.25:
+            grade = "Grade A"
+        elif ratio < 1:
+            grade = "Grade B"
+        else:
+            grade = "Grade C"
+
+        # 🔥 تعديل Grade حسب الحالة
+        if smoking == "Yes" or diabetes == "Uncontrolled":
+            grade = "Grade C (High Risk)"
+        elif diabetes == "Controlled":
+            grade = "Grade B (Moderate Risk)"
+
+        # Treatment
+        treatment = "Scaling + Root Planing"
+
+        if stage in ["Stage III", "Stage IV"]:
+            treatment += " + Surgical Therapy"
+
+        if smoking == "Yes":
+            treatment += " + Smoking cessation advice"
+
+        if diabetes != "No":
+            treatment += " + Medical consultation"
 
     else:
         diagnosis = "Healthy"
