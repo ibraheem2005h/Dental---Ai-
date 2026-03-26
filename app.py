@@ -1,45 +1,50 @@
 import streamlit as st
 
-st.title("🦷 Advanced Periodontal Diagnosis")
+st.set_page_config(page_title="Dental Diagnosis", page_icon="🦷")
 
-# Patient Info
-name = st.text_input("Patient Name")
-age = st.number_input("Age", 1, 120, 25)
-gender = st.selectbox("Gender", ["Male", "Female"])
+# 🔹 Title + Clinic Name
+st.title("🦷 Dental Diagnosis System")
+st.markdown("<h2 style='text-align: center; color: #555;'>IMS Dental Clinic</h2>", unsafe_allow_html=True)
 
-# Life Style
+# 🔹 Patient Name
+patient_name = st.text_input("Patient Name")
+
+# 🔹 Inputs
+age = st.number_input("Age", min_value=1, max_value=100, value=25)
+
+bleeding = st.selectbox("Bleeding on Probing", ["No", "Yes"])
+
+pocket = st.number_input("Pocket Depth (mm)", min_value=1, max_value=15, value=3)
+
+cal = st.number_input("Clinical Attachment Loss (mm)", min_value=0, max_value=15, value=0)
+
+# 🔹 Life Style
 lifestyle = st.multiselect(
     "Life Style",
-    ["Smoking", "Alcohol", "Drugs"]
+    ["None", "Smoking", "Alcohol", "Drugs"]
 )
 
-# Medical Conditions
-diseases = st.multiselect(
+# 🔹 Medical Conditions
+medical = st.multiselect(
     "Medical Conditions",
-    [
-        "Diabetes",
-        "Cardiovascular Disease",
-        "Hypertension",
-        "Osteoporosis",
-        "Immunocompromised",
-        "Pregnancy",
-        "None"
-    ]
+    ["None", "Diabetes", "Hypertension", "Hypotension", "Liver Disease", "Kidney Disease"]
 )
 
-# Clinical Data
-pocket = st.number_input("Pocket Depth (mm)", 1, 15, 3)
-bleeding = st.selectbox("Bleeding on Probing", ["No", "Yes"])
-cal = st.number_input("Clinical Attachment Loss (mm)", 0, 15, 0)
-
+# 🔹 Diagnose
 if st.button("Diagnose"):
 
-    # Diagnosis
+    risk = "Normal"
+
+    # 🔴 Risk
+    if ("Smoking" in lifestyle or "Diabetes" in medical):
+        risk = "High Risk Patient"
+
+    # 🟢 Diagnosis
     if bleeding == "Yes" and cal == 0:
-    if pocket > 3:
-        diagnosis = "Severe Gingivitis"
-    else:
-        diagnosis = "Gingivitis"
+        if pocket > 3:
+            diagnosis = "Severe Gingivitis"
+        else:
+            diagnosis = "Gingivitis"
         stage = "-"
         grade = "-"
         treatment = "Scaling and oral hygiene"
@@ -47,7 +52,7 @@ if st.button("Diagnose"):
     elif cal >= 1:
         diagnosis = "Periodontitis"
 
-        # Stage
+        # 🔹 Stage
         if cal <= 2:
             stage = "Stage I"
         elif cal <= 4:
@@ -57,61 +62,34 @@ if st.button("Diagnose"):
         else:
             stage = "Stage IV"
 
-        # Grade
+        # 🔹 Grade
         ratio = cal / age
 
-        if ratio < 0.25:
+        if "Smoking" in lifestyle or "Diabetes" in medical:
+            grade = "Grade C"
+        elif ratio < 0.25:
             grade = "Grade A"
         elif ratio < 1:
             grade = "Grade B"
         else:
             grade = "Grade C"
 
-        # تعديل حسب lifestyle
-        if "Smoking" in lifestyle or "Drugs" in lifestyle:
-            grade = "Grade C (High Risk)"
-
-        # تعديل حسب الأمراض
-        if "Diabetes" in diseases or "Immunocompromised" in diseases:
-            grade = "Grade C (Systemic Risk)"
-        elif "Cardiovascular Disease" in diseases:
-            grade = "Grade B (Medical Risk)"
-
-        # Treatment
-        treatment = "Scaling + Root Planing"
-
-        if stage in ["Stage III", "Stage IV"]:
-            treatment += " + Surgical Therapy"
-
-        if "Smoking" in lifestyle:
-            treatment += " + Smoking cessation"
-
-        if diseases and "None" not in diseases:
-            treatment += " + Medical consultation"
+        treatment = "Deep cleaning / Surgery if needed"
 
     else:
         diagnosis = "Healthy"
         stage = "-"
         grade = "-"
-        treatment = "Routine care"
+        treatment = "Routine check-up"
 
-    # Output
-    st.subheader("Result")
+    # 🔹 Results
+    st.subheader("IMS Dental Clinic")
+    st.write(f"Patient Name: {patient_name}")
 
-    # High Risk Alert
-    if ("Smoking" in lifestyle or "Drugs" in lifestyle or
-        "Diabetes" in diseases or stage in ["Stage III", "Stage IV"]):
-        st.error("⚠️ High Risk Patient")
+    if risk == "High Risk Patient":
+        st.warning("⚠️ High Risk Patient")
 
-    # Colored Diagnosis
-    if diagnosis == "Healthy":
-        st.success(f"Diagnosis: {diagnosis}")
-    elif diagnosis == "Gingivitis":
-        st.warning(f"Diagnosis: {diagnosis}")
-    else:
-        st.error(f"Diagnosis: {diagnosis}")
-
-    st.write("Name:", name)
-    st.write("Stage:", stage)
-    st.write("Grade:", grade)
-    st.write("Treatment:", treatment)
+    st.success(f"Diagnosis: {diagnosis}")
+    st.write(f"Stage: {stage}")
+    st.write(f"Grade: {grade}")
+    st.write(f"Treatment: {treatment}")
