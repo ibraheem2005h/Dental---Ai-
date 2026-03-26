@@ -35,7 +35,10 @@ cal = st.number_input("Clinical Attachment Loss (mm)", 0, 15, 0)
 if st.button("Diagnose"):
 
     # Diagnosis
-    if bleeding == "Yes" and pocket <= 3 and cal == 0:
+    if bleeding == "Yes" and cal == 0:
+    if pocket > 3:
+        diagnosis = "Severe Gingivitis"
+    else:
         diagnosis = "Gingivitis"
         stage = "-"
         grade = "-"
